@@ -1,0 +1,61 @@
+﻿@inherits LayoutComponentBase
+
+<MudThemeProvider/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
+
+<MudLayout>
+
+    <MudAppBar Elevation="0">
+        <MudText Typo="Typo.h5">NPM Search Packages</MudText>
+    </MudAppBar>
+
+    <MudMainContent>
+        <MudContainer>
+
+            <MudItem Class="mb-2">
+                <MudTextField 
+                    @bind-Value="@textValue"
+                    @onblur="SearchAsync"
+                    Label="Rechercher..." 
+                    Variant="Variant.Outlined" 
+                    Adornment="Adornment.End" 
+                    AdornmentIcon="@Icons.Filled.Search" />
+            </MudItem>
+
+            <MudGrid>
+                @if (registryResponse != null)
+                {
+                    @foreach (var item in registryResponse.Objects)
+                    {
+                        <PackageCard Package="@item.Package" />
+                    }
+                }
+            </MudGrid>
+
+        </MudContainer>
+    </MudMainContent>
+
+</MudLayout>
+
+@code {
+    private RestClient client = new RestClient("https://registry.npmjs.com/-/v1/search");
+    private RegistryResponse registryResponse;
+    private string textValue;
+
+    private async Task SearchAsync()
+    {
+        var request = new RestRequest(Method.GET);
+        request.AddParameter("text", textValue);
+
+        var response = await client.ExecuteAsync(request);
+
+        if (response.StatusCode == HttpStatusCode.OK)
+        {
+            var json = response.Content;
+
+            registryResponse = JsonSerializer.Deserialize<RegistryResponse>(json);
+        }
+    }
+
+}

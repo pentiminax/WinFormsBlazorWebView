@@ -1,0 +1,31 @@
+﻿@inject IJSRuntime jsRuntime
+
+<MudItem xs="12" md="6" lg="3">
+    <MudCard Style="height: 220px;" Outlined="true">
+
+        <MudCardContent>
+            <MudCardHeader>
+                <MudText Typo="Typo.h6">@Package.Name</MudText>
+            </MudCardHeader>
+        </MudCardContent>
+
+        <MudCardContent>
+            <MudText Typo="Typo.body2">@Package.Description</MudText>
+        </MudCardContent>
+
+        <MudCardActions>
+            <MudButton OnClick="@((e) => ProcessLinkAsync(@Package.Links.NPM))" Variant="Variant.Text" Color="Color.Primary">En savoir plus</MudButton>
+        </MudCardActions>
+
+    </MudCard>
+</MudItem>
+
+@code {
+    [Parameter]
+    public Package Package { get; set; }
+
+    private async void ProcessLinkAsync(string url)
+    {
+        await jsRuntime.InvokeVoidAsync("open", url);
+    }
+}
